@@ -1,0 +1,48 @@
+{
+  "name": "starlight-skills",
+  "version": "0.1.0",
+  "description": "A Starlight plugin that turns your documentation into AI-installable skills",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./pages/*": "./pages/*"
+  },
+  "files": [
+    "dist",
+    "pages",
+    "virtual.d.ts"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "astro",
+    "starlight",
+    "starlight-plugin",
+    "skills",
+    "ai",
+    "claude",
+    "withastro"
+  ],
+  "peerDependencies": {
+    "@astrojs/starlight": ">=0.21.0",
+    "astro": ">=4.0.0"
+  },
+  "dependencies": {
+    "glob": "^11.0.0",
+    "gray-matter": "^4.0.3"
+  },
+  "devDependencies": {
+    "@astrojs/starlight": "^0.32.0",
+    "astro": "^5.0.0",
+    "typescript": "^5.7.0",
+    "vite": "^6.0.0"
+  }
+}
