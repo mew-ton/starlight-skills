@@ -18,8 +18,8 @@
     "virtual.d.ts"
   ],
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc --watch",
+    "build": "tsdown",
+    "dev": "tsdown --watch",
     "prepublishOnly": "npm run build"
   },
   "keywords": [
@@ -42,7 +42,7 @@
   "devDependencies": {
     "@astrojs/starlight": "^0.32.0",
     "astro": "^5.0.0",
-    "typescript": "^5.7.0",
-    "vite": "^6.0.0"
+    "tsdown": "^0.12.0",
+    "typescript": "^5.7.0"
   }
 }
