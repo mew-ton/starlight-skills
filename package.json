@@ -7,11 +7,12 @@
   ],
   "scripts": {
     "build": "turbo build",
-    "dev": "turbo dev --filter=starlight-skills-docs",
+    "dev": "turbo dev --filter=docs",
     "typecheck": "turbo typecheck",
-    "preview": "turbo preview --filter=starlight-skills-docs"
+    "preview": "turbo preview --filter=docs"
   },
   "devDependencies": {
     "turbo": "^2.0.0"
-  }
+  },
+  "packageManager": "pnpm@10.32.1"
 }

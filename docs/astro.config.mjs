@@ -26,11 +26,10 @@ export default defineConfig({
         },
         {
           label: 'Guides',
-          items: [
-            { label: 'Marking a Page as a Skill', link: '/guides/marking-skills/' },
-            { label: 'Build Output', link: '/guides/build-output/' },
-            { label: 'Skill Catalog Page', link: '/guides/catalog/' },
-          ],
+          autogenerate: {
+            directory: 'guides',
+            collapsed: false,
+          }
         },
       ],
       plugins: [
