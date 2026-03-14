@@ -2,6 +2,11 @@
   "name": "starlight-skills",
   "version": "0.1.0",
   "description": "A Starlight plugin that turns your documentation into AI-installable skills",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mew-ton/starlight-skills",
+    "directory": "./packages/starlight-skills"
+  },
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -42,7 +47,7 @@
   "devDependencies": {
     "@astrojs/starlight": "^0.32.0",
     "astro": "^5.0.0",
-    "typescript": "^5.7.0",
+    "typescript": "^5.9.3",
     "vite": "^6.0.0"
   }
 }
