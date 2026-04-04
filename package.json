@@ -9,7 +9,7 @@
     "build": "turbo build",
     "dev": "turbo dev",
     "typecheck": "turbo typecheck",
-    "preview": "turbo preview --filter=docs",
+    "preview": "turbo preview --filter=starlight-skills-docs",
     "lint": "biome lint .",
     "format": "biome format . --write",
     "check": "biome check . --write",
