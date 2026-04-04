@@ -1,5 +1,7 @@
 # starlight-skills
 
+*[Read this in English (英語) 🇺🇸](./README.md)*
+
 ドキュメントを AI インストール可能なスキルに変換する [Starlight](https://starlight.astro.build/) プラグイン。
 
 一度書けば、人間にも AI エージェントにも届く。
@@ -86,14 +88,29 @@ subfiles:
 
 ```ts
 starlightSkills({
+  /** 対象となるロケールディスカバリー。デフォルト: Starlight のデフォルトロケール */
+  targetLocale: 'ja',
+
+  /** 出力先。'well-known-endpoint' | 'collocated' | 'both'。デフォルト: 'both' */
+  outputMode: 'both',
+
+  /** 自動生成するページ。デフォルト: { skill: true, catalog: true } */
+  autoGeneratePages: { skill: true, catalog: true },
+
   /** skill-category の自動検出方法。'path' | 'slug' | false。デフォルト: 'path' */
   autoCategoryMode: 'path',
 
-  /** 生成されるカタログページの URL。デフォルト: '/skills-catalog' */
-  catalogPath: '/skills-catalog',
+  /** 自動生成されるページのベースURLパス。デフォルト: '__skills' */
+  skillsRoot: '__skills',
+
+  /** カタログのカテゴリ表示スタイル。'nested' | 'flat'。デフォルト: 'nested' */
+  catalogCategoryDisplay: 'nested',
 
   /** サイドバーのグループラベル。デフォルト: 'Skills' */
   sidebarLabel: 'Skills',
+
+  /** 'collocated' 時の出力先ディレクトリ。デフォルト: 'skills' */
+  collocatedDir: 'skills',
 })
 ```
 
