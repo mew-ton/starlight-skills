@@ -1,6 +1,6 @@
 {
   "name": "starlight-skills",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A Starlight plugin that turns your documentation into AI-installable skills",
   "repository": {
     "type": "git",
