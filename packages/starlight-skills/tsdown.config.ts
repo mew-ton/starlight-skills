@@ -5,6 +5,6 @@ export default defineConfig({
   format: 'esm',
   dts: true,
   clean: true,
-  tsconfig: "./tsconfig.main.json",
+  tsconfig: './tsconfig.main.json',
   external: ['astro', '@astrojs/starlight'],
 });
