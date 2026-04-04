@@ -9,7 +9,7 @@
     "build": "turbo build",
     "dev": "turbo dev",
     "typecheck": "turbo typecheck",
-    "preview": "turbo preview --filter=docs",
+    "preview": "turbo preview --filter=starlight-skills-docs",
     "lint": "biome lint .",
     "format": "biome format . --write",
     "check": "biome check . --write",
@@ -17,6 +17,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "catalog:",
+    "@changesets/cli": "^2.30.0",
     "turbo": "^2.9.3"
   },
   "engines": {
