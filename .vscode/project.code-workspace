@@ -1,0 +1,22 @@
+{
+  "folders": [
+    {
+      "name": "#ROOT",
+      "path": "../"
+    },
+    {
+      "name": "#DOCS",
+      "path": "../docs"
+    },
+    {
+      "name": "starlight-skills",
+      "path": "../packages/starlight-skills"
+    }
+  ],
+  "extensions": {
+    "recommendations": [
+      "biomejs.biome",
+      "astro-build.astro-vscode"
+    ]
+  }
+}
