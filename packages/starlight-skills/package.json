@@ -8,24 +8,25 @@
     "directory": "./packages/starlight-skills"
   },
   "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    },
-    "./pages/*": "./pages/*"
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
+    }
   },
   "files": [
     "dist",
-    "pages",
+    "src/components",
     "virtual.d.ts"
   ],
   "scripts": {
-    "build": "tsdown",
     "dev": "tsdown --watch",
-    "typecheck": "tsc --noEmit"
+    "build": "tsdown",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest --run"
   },
   "keywords": [
     "astro",
@@ -42,13 +43,15 @@
   },
   "dependencies": {
     "glob": "^13.0.6",
-    "gray-matter": "^4.0.3"
+    "gray-matter": "^4.0.3",
+    "marked": "^15.0.0"
   },
   "devDependencies": {
-    "@astrojs/starlight": "^0.32.0",
-    "@tsconfig/strictest": "^2.0.8",
-    "astro": "^5.0.0",
-    "tsdown": "^0.12.0",
-    "typescript": "^5.9.3"
+    "@astrojs/starlight": "catalog:",
+    "@tsconfig/strictest": "catalog:",
+    "astro": "catalog:",
+    "tsdown": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }

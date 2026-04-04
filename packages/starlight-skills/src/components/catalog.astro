@@ -1,0 +1,192 @@
+---
+/**
+ * Skills Catalog page — injected by the starlight-skills plugin at /<skillsRoot>/.
+ *
+ * Lists all recognised skills grouped by category.
+ * noindex is set to prevent duplicate-content SEO issues.
+ */
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { skills, options } from 'virtual:starlight-skills/data';
+
+// ----------------------------------------------------------------
+// Types
+// ----------------------------------------------------------------
+
+interface SkillEntry {
+  name: string;
+  title: string;
+  description: string;
+  href: string;
+}
+
+/** Flattened row used for linear rendering (no recursion needed). */
+interface SectionRow {
+  /** Heading level: 2 for top-level, 3 for one level deep, etc. */
+  level: 2 | 3 | 4 | 5 | 6;
+  label: string;
+  skills: SkillEntry[];
+}
+
+// ----------------------------------------------------------------
+// Helpers
+// ----------------------------------------------------------------
+
+const useSkillPage = options.autoGeneratePages.skill;
+
+function makeEntry(skill: typeof skills[number]): SkillEntry {
+  return {
+    name: skill.name,
+    title: skill.title,
+    description: skill.description,
+    href: useSkillPage ? skill.skillPageUrl : skill.sourceUrl,
+  };
+}
+
+/** Flatten a category tree into ordered heading rows for linear rendering. */
+function flattenTree(
+  tree: Map<string, { skills: SkillEntry[]; children: string[] }>,
+  keys: string[],
+  level: 2 | 3 | 4 | 5 | 6,
+  out: SectionRow[],
+) {
+  for (const key of keys) {
+    const node = tree.get(key)!;
+    out.push({ level, label: key.split('/').pop()!, skills: node.skills });
+    if (node.children.length > 0 && level < 6) {
+      flattenTree(tree, node.children, (level + 1) as 3 | 4 | 5 | 6, out);
+    }
+  }
+}
+
+function buildRows(): { rows: SectionRow[]; uncategorised: SkillEntry[] } {
+  const isFlat = options.catalogCategoryDisplay === 'flat';
+
+  const byCategory = new Map<string, SkillEntry[]>();
+  const uncategorised: SkillEntry[] = [];
+
+  for (const skill of skills) {
+    const entry = makeEntry(skill);
+    if (!skill.category) {
+      uncategorised.push(entry);
+    } else {
+      const arr = byCategory.get(skill.category) ?? [];
+      arr.push(entry);
+      byCategory.set(skill.category, arr);
+    }
+  }
+
+  const rows: SectionRow[] = [];
+
+  if (isFlat) {
+    // One section per full category path, sorted
+    for (const [cat, catSkills] of [...byCategory.entries()].sort()) {
+      rows.push({ level: 2, label: cat, skills: catSkills });
+    }
+  } else {
+    // Build parent→children tree, then flatten
+    type Node = { skills: SkillEntry[]; children: string[] };
+    const tree = new Map<string, Node>();
+    const roots: string[] = [];
+
+    function ensureNode(cat: string): Node {
+      if (tree.has(cat)) return tree.get(cat)!;
+      const node: Node = { skills: [], children: [] };
+      tree.set(cat, node);
+      const segments = cat.split('/');
+      if (segments.length > 1) {
+        const parent = segments.slice(0, -1).join('/');
+        ensureNode(parent).children.push(cat);
+      } else {
+        roots.push(cat);
+      }
+      return node;
+    }
+
+    for (const [cat, catSkills] of [...byCategory.entries()].sort()) {
+      ensureNode(cat).skills = catSkills;
+    }
+
+    flattenTree(tree, roots, 2, rows);
+  }
+
+  return { rows, uncategorised };
+}
+
+const { rows, uncategorised } = buildRows();
+---
+
+<StarlightPage
+  frontmatter={{
+    title: 'Skills Catalog',
+    description: 'All AI skills available in this repository.',
+    head: [{ tag: 'meta', attrs: { name: 'robots', content: 'noindex' } }],
+  }}
+>
+  {skills.length === 0 ? (
+    <p>
+      <em>
+        No skills found. Add <code>skill: true</code> to the frontmatter of a
+        documentation page.
+      </em>
+    </p>
+  ) : (
+    <>
+      <p>Install skills from this repository with:</p>
+      <pre><code>npx skills add &lt;repository&gt;</code></pre>
+
+      {rows.map((row) => (
+        <>
+          {row.level === 2 && <h2>{row.label}</h2>}
+          {row.level === 3 && <h3>{row.label}</h3>}
+          {row.level === 4 && <h4>{row.label}</h4>}
+          {row.level === 5 && <h5>{row.label}</h5>}
+          {row.level === 6 && <h6>{row.label}</h6>}
+          {row.skills.length > 0 && (
+            <dl class="sl-skills-list">
+              {row.skills.map((entry) => (
+                <>
+                  <dt>
+                    <a href={entry.href}><code>{entry.name}</code></a>
+                  </dt>
+                  <dd>{entry.description || <em>No description.</em>}</dd>
+                </>
+              ))}
+            </dl>
+          )}
+        </>
+      ))}
+
+      {uncategorised.length > 0 && (
+        <>
+          {rows.length > 0 && <h2>Uncategorised</h2>}
+          <dl class="sl-skills-list">
+            {uncategorised.map((entry) => (
+              <>
+                <dt>
+                  <a href={entry.href}><code>{entry.name}</code></a>
+                </dt>
+                <dd>{entry.description || <em>No description.</em>}</dd>
+              </>
+            ))}
+          </dl>
+        </>
+      )}
+    </>
+  )}
+</StarlightPage>
+
+<style>
+  .sl-skills-list {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.25rem 1.5rem;
+    margin-block: 1rem;
+  }
+  .sl-skills-list dt {
+    font-weight: 600;
+  }
+  .sl-skills-list dd {
+    margin: 0;
+    color: var(--sl-color-gray-2);
+  }
+</style>

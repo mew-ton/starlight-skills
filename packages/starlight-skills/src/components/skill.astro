@@ -1,0 +1,143 @@
+---
+/**
+ * Skill page — injected at /<skillsRoot>/[skill].
+ *
+ * Shows a skill's metadata and body content as it appears in the AI skill
+ * distribution (SKILL.md format), rendered for human reading.
+ * noindex prevents duplicate-content issues with the source page.
+ */
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { marked } from 'marked';
+import { skills } from 'virtual:starlight-skills/data';
+
+export function getStaticPaths() {
+  return skills.map((skill) => ({
+    params: { skill: skill.name },
+    props: { skill },
+  }));
+}
+
+type Props = { skill: typeof skills[number] };
+
+const { skill } = Astro.props;
+
+const bodyHtml = await marked.parse(skill.bodyContent, { async: true });
+---
+
+<StarlightPage
+  frontmatter={{
+    title: skill.title,
+    description: skill.description,
+    head: [{ tag: 'meta', attrs: { name: 'robots', content: 'noindex' } }],
+  }}
+>
+  <!-- Skill metadata block -->
+  <dl class="sl-skill-meta">
+    <dt>Skill name</dt>
+    <dd><code>{skill.name}</code></dd>
+
+    {skill.description && (
+      <>
+        <dt>Description</dt>
+        <dd>{skill.description}</dd>
+      </>
+    )}
+
+    {skill.category && (
+      <>
+        <dt>Category</dt>
+        <dd>{skill.category}</dd>
+      </>
+    )}
+
+    {skill.license && (
+      <>
+        <dt>License</dt>
+        <dd>{skill.license}</dd>
+      </>
+    )}
+
+    {skill.compatibility && (
+      <>
+        <dt>Compatibility</dt>
+        <dd>{skill.compatibility}</dd>
+      </>
+    )}
+
+    {skill.allowedTools && (
+      <>
+        <dt>Allowed tools</dt>
+        <dd><code>{skill.allowedTools}</code></dd>
+      </>
+    )}
+
+    {skill.metadata && Object.keys(skill.metadata).length > 0 && (
+      <>
+        <dt>Metadata</dt>
+        <dd>
+          <dl class="sl-skill-metadata-inner">
+            {Object.entries(skill.metadata).map(([k, v]) => (
+              <>
+                <dt>{k}</dt>
+                <dd>{v}</dd>
+              </>
+            ))}
+          </dl>
+        </dd>
+      </>
+    )}
+  </dl>
+
+  <hr />
+
+  <!-- Skill body rendered from Markdown -->
+  <div class="sl-markdown-content" set:html={bodyHtml} />
+
+  <!-- Companion files -->
+  {skill.subfiles.length > 0 && (
+    <>
+      <h2>Companion files</h2>
+      <ul class="sl-skill-subfiles">
+        {skill.subfiles.map((sf) => (
+          <li>
+            <a href={sf.viewerUrl}><code>{sf.relativePath}</code></a>
+          </li>
+        ))}
+      </ul>
+    </>
+  )}
+</StarlightPage>
+
+<style>
+  .sl-skill-meta {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 0.25rem 1.5rem;
+    background: var(--sl-color-gray-6);
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.5rem;
+    padding: 1rem 1.25rem;
+    margin-block-end: 1.5rem;
+  }
+  .sl-skill-meta dt {
+    font-weight: 600;
+    color: var(--sl-color-gray-2);
+    font-size: var(--sl-text-sm);
+  }
+  .sl-skill-meta dd {
+    margin: 0;
+  }
+  .sl-skill-metadata-inner {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 0.125rem 1rem;
+    margin: 0;
+  }
+  .sl-skill-subfiles {
+    list-style: none;
+    padding: 0;
+  }
+  .sl-skill-subfiles li + li {
+    margin-block-start: 0.25rem;
+  }
+</style>

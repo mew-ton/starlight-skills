@@ -1,0 +1,34 @@
+---
+title: Welcome to starlight-skills
+description: Get started building docs and Agent Skills side-by-side.
+template: splash
+hero:
+  tagline: Generate Agent Skills seamlessly from your Astro Starlight documentation.
+  image:
+    file: ../../assets/houston.webp
+  actions:
+    - text: Getting Started
+      link: /01-getting-started/
+      icon: right-arrow
+    - text: View on GitHub
+      link: https://github.com/mew-ton/starlight-skills
+      icon: external
+      variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+<CardGrid stagger>
+	<Card title="One Single Source of Truth" icon="pencil">
+		Author your documentation normally and let the plugin automatically deploy it as an AI Agent Skill.
+	</Card>
+	<Card title="Perfect for both Humans and AI" icon="add-document">
+		Documents optimized for human readers and AI agents exist peacefully, co-located in your codebase.
+	</Card>
+	<Card title="Agent Skills Spec" icon="setting">
+		Fully compatible with the Agent Skills specification, making your docs instantly usable by AI tools.
+	</Card>
+	<Card title="Automatic Catalogs" icon="open-book">
+		Generate visual catalogs summarizing your available AI skills directly on your Starlight site.
+	</Card>
+</CardGrid>

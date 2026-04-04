@@ -1,0 +1,34 @@
+---
+title: starlight-skills へようこそ
+description: Astro Starlight でドキュメントと AI スキルを一元管理するプラグイン。
+template: splash
+hero:
+  tagline: Astro Starlight のドキュメントから AI エージェントのスキルをシームレスに生成します。
+  image:
+    file: ../../../assets/houston.webp
+  actions:
+    - text: はじめに
+      link: /ja/getting-started/
+      icon: right-arrow
+    - text: GitHub で見る
+      link: https://github.com/mew-ton/starlight-skills
+      icon: external
+      variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+<CardGrid stagger>
+	<Card title="One Single Source of Truth" icon="pencil">
+		普段通りにドキュメントを書くだけで、プラグインが自動的に AI エージェントのスキルとして出力します。
+	</Card>
+	<Card title="人間と AI の両方に最適" icon="add-document">
+		人間向けに最適化されたドキュメントと、AI向けのルールをひとつのリポジトリで平和裏に共存させます。
+	</Card>
+	<Card title="Agent Skills 仕様準拠" icon="setting">
+		Agent Skills 仕様に完全対応しており、AI エージェントがすぐに利用できる形式で構成されます。
+	</Card>
+	<Card title="カタログの自動生成" icon="open-book">
+		利用可能な AI スキルを一覧化するカタログページを、Starlight サイト上に動的に生成します。
+	</Card>
+</CardGrid>

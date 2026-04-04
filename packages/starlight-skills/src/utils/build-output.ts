@@ -1,19 +1,19 @@
 import { copyFile, mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import { glob } from 'glob';
-import type { SkillData } from '../types.js';
+import type { ResolvedSkill, ResolvedOptions } from '../types.js';
 
 // ---------------------------------------------------------------------------
 // SKILL.md generation
 // ---------------------------------------------------------------------------
 
 /**
- * Build a SKILL.md file body conforming to the Agent Skills specification.
- * Only `name` and `description` from the source frontmatter are forwarded;
- * Starlight-specific fields (skill, skill-name, etc.) are stripped.
+ * Build a SKILL.md file conforming to the Agent Skills specification.
+ * Only skill-relevant frontmatter fields are forwarded; Starlight-specific
+ * fields (skill, skill-name, title, skill-category, subfiles, etc.) are stripped.
  */
-function buildSkillMarkdown(skill: SkillData): string {
+function buildSkillMarkdown(skill: ResolvedSkill): string {
   const lines: string[] = ['---', `name: ${skill.name}`];
+
   if (skill.description) {
     lines.push(`description: ${JSON.stringify(skill.description)}`);
   }
@@ -32,44 +32,37 @@ function buildSkillMarkdown(skill: SkillData): string {
       lines.push(`  ${k}: ${JSON.stringify(v)}`);
     }
   }
+
   lines.push('---');
-  // Preserve one blank line between frontmatter and body
+
+  // Ensure a blank line between frontmatter and body
   const body = skill.bodyContent.startsWith('\n')
     ? skill.bodyContent
     : '\n' + skill.bodyContent;
   lines.push(body);
+
   return lines.join('\n');
 }
 
 // ---------------------------------------------------------------------------
-// Subfile helpers
+// Subfile copying
 // ---------------------------------------------------------------------------
 
-async function copySubfiles(
-  skill: SkillData,
-  destDir: string,
-): Promise<void> {
-  const sourceDir = path.dirname(skill.filePath);
-  for (const pattern of skill.subfiles) {
-    const matches = await glob(pattern, { cwd: sourceDir, absolute: true });
-    for (const src of matches) {
-      const rel = path.relative(sourceDir, src);
-      const dest = path.join(destDir, rel);
-      await mkdir(path.dirname(dest), { recursive: true });
-      await copyFile(src, dest);
-    }
+async function copySubfiles(skill: ResolvedSkill, destDir: string): Promise<void> {
+  for (const subfile of skill.subfiles) {
+    const dest = path.join(destDir, subfile.relativePath);
+    await mkdir(path.dirname(dest), { recursive: true });
+    await copyFile(subfile.absolutePath, dest);
   }
 }
 
 // ---------------------------------------------------------------------------
-// index.json  (WellKnownIndex spec — vercel-labs/skills)
+// index.json
 // ---------------------------------------------------------------------------
 
-/** Matches the WellKnownSkillEntry interface from vercel-labs/skills. */
 interface WellKnownSkillEntry {
   name: string;
   description: string;
-  /** Paths of all files in this skill's directory, relative to that directory. */
   files: string[];
 }
 
@@ -77,88 +70,78 @@ interface WellKnownIndex {
   skills: WellKnownSkillEntry[];
 }
 
-/**
- * Resolve the full set of files that will be written for a skill.
- * Returns paths relative to the skill's own directory (e.g. "SKILL.md",
- * "references/api.md", "scripts/run.js").
- */
-async function resolveSkillFiles(skill: SkillData): Promise<string[]> {
-  const files: string[] = ['SKILL.md'];
-  const sourceDir = path.dirname(skill.filePath);
-  for (const pattern of skill.subfiles) {
-    const matches = await glob(pattern, { cwd: sourceDir });
-    // glob returns paths relative to cwd when absolute is not set
-    files.push(...matches.map((m) => m.replace(/\\/g, '/')));
-  }
-  return files;
-}
-
-async function buildIndexJson(skills: SkillData[]): Promise<WellKnownIndex> {
-  const entries: WellKnownSkillEntry[] = await Promise.all(
-    skills.map(async (s) => ({
+function buildIndexJson(skills: ResolvedSkill[]): WellKnownIndex {
+  return {
+    skills: skills.map((s) => ({
       name: s.name,
       description: s.description,
-      files: await resolveSkillFiles(s),
+      files: ['SKILL.md', ...s.subfiles.map((f) => f.relativePath)],
     })),
+  };
+}
+
+// ---------------------------------------------------------------------------
+// well-known-endpoint output
+// ---------------------------------------------------------------------------
+
+async function writeWellKnown(skills: ResolvedSkill[], distDir: string): Promise<void> {
+  const wellKnownDir = path.join(distDir, '.well-known', 'skills');
+  await mkdir(wellKnownDir, { recursive: true });
+
+  // index.json
+  await writeFile(
+    path.join(wellKnownDir, 'index.json'),
+    JSON.stringify(buildIndexJson(skills), null, 2),
+    'utf-8',
   );
-  return { skills: entries };
+
+  for (const skill of skills) {
+    const skillDir = path.join(wellKnownDir, skill.name);
+    await mkdir(skillDir, { recursive: true });
+    await writeFile(path.join(skillDir, 'SKILL.md'), buildSkillMarkdown(skill), 'utf-8');
+    await copySubfiles(skill, skillDir);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// collocated output
+// ---------------------------------------------------------------------------
+
+async function writeCollocated(
+  skills: ResolvedSkill[],
+  projectRoot: string,
+  collocatedDir: string,
+): Promise<void> {
+  // Resolve relative paths against the Astro project root; absolute paths pass through as-is.
+  const skillsDir = path.resolve(projectRoot, collocatedDir);
+  await mkdir(skillsDir, { recursive: true });
+
+  for (const skill of skills) {
+    const skillDir = path.join(skillsDir, skill.name);
+    await mkdir(skillDir, { recursive: true });
+    await writeFile(path.join(skillDir, 'SKILL.md'), buildSkillMarkdown(skill), 'utf-8');
+    await copySubfiles(skill, skillDir);
+  }
 }
 
 // ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
 
-/**
- * Write the two output trees produced by starlight-skills after an Astro build:
- *
- * 1. `<dist>/.well-known/skills/` — deployed discovery endpoint
- *    - index.json (skill registry)
- *    - <name>/SKILL.md (spec-compliant skill file)
- *    - <name>/<subfile> (companion files)
- *
- * 2. `<projectRoot>/skills/` — committed to the repository
- *    - <name>/SKILL.md
- *    - <name>/<subfile>
- */
 export async function writeBuildOutput(
-  skills: SkillData[],
+  skills: ResolvedSkill[],
+  options: ResolvedOptions,
   distDir: string,
   projectRoot: string,
 ): Promise<void> {
-  // 1. .well-known/skills/
-  const wellKnownSkillsDir = path.join(distDir, '.well-known', 'skills');
-  await mkdir(wellKnownSkillsDir, { recursive: true });
+  if (skills.length === 0) return;
 
-  // index.json
-  await writeFile(
-    path.join(wellKnownSkillsDir, 'index.json'),
-    JSON.stringify(await buildIndexJson(skills), null, 2),
-    'utf-8',
-  );
+  const { outputMode } = options;
 
-  for (const skill of skills) {
-    const skillWellKnownDir = path.join(wellKnownSkillsDir, skill.name);
-    await mkdir(skillWellKnownDir, { recursive: true });
-    await writeFile(
-      path.join(skillWellKnownDir, 'SKILL.md'),
-      buildSkillMarkdown(skill),
-      'utf-8',
-    );
-    await copySubfiles(skill, skillWellKnownDir);
+  if (outputMode === 'well-known-endpoint' || outputMode === 'both') {
+    await writeWellKnown(skills, distDir);
   }
-
-  // 2. <projectRoot>/skills/
-  const projectSkillsDir = path.join(projectRoot, 'skills');
-  await mkdir(projectSkillsDir, { recursive: true });
-
-  for (const skill of skills) {
-    const skillProjectDir = path.join(projectSkillsDir, skill.name);
-    await mkdir(skillProjectDir, { recursive: true });
-    await writeFile(
-      path.join(skillProjectDir, 'SKILL.md'),
-      buildSkillMarkdown(skill),
-      'utf-8',
-    );
-    await copySubfiles(skill, skillProjectDir);
+  if (outputMode === 'collocated' || outputMode === 'both') {
+    await writeCollocated(skills, projectRoot, options.collocatedDir);
   }
 }

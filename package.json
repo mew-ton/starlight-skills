@@ -7,7 +7,7 @@
   ],
   "scripts": {
     "build": "turbo build",
-    "dev": "turbo dev --filter=docs",
+    "dev": "turbo dev",
     "typecheck": "turbo typecheck",
     "preview": "turbo preview --filter=docs"
   },

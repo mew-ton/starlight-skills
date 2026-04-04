@@ -1,3 +1,7 @@
+// ---------------------------------------------------------------------------
+// Frontmatter
+// ---------------------------------------------------------------------------
+
 /**
  * Frontmatter fields recognized by starlight-skills.
  * These extend the standard Starlight/Astro frontmatter.
@@ -26,7 +30,7 @@ export interface SkillFrontmatter {
   /** Page title — fallback source for `skill-name` when omitted. */
   title?: string;
 
-  // --- Optional Agent Skills spec fields forwarded verbatim to SKILL.md ---
+  // --- Agent Skills spec fields forwarded verbatim to SKILL.md ---
 
   /** License name or reference to a bundled license file (e.g. "MIT", "LICENSE"). */
   'skill-license'?: string;
@@ -41,62 +45,162 @@ export interface SkillFrontmatter {
    */
   'skill-metadata'?: Record<string, string>;
   /**
-   * Space-delimited list of pre-approved tools (experimental).
+   * Space-delimited list of pre-approved tools.
    * Example: "Bash(git:*) Bash(jq:*) Read"
    */
   'skill-allowed-tools'?: string;
 }
 
-/** Processed, validated skill metadata resolved during configuration. */
-export interface SkillData {
-  /** Validated skill name (lowercase alphanumeric + hyphens). */
+// ---------------------------------------------------------------------------
+// Internal resolved skill (used at build time, not exposed via virtual module)
+// ---------------------------------------------------------------------------
+
+/** Resolved companion file entry. */
+export interface ResolvedSubfile {
+  /** Relative path from the skill's source directory (e.g. "references/api.md"). */
+  relativePath: string;
+  /** Absolute path to the source file. */
+  absolutePath: string;
+  /** File extension without leading dot (e.g. "md", "ts"). */
+  ext: string;
+  /** UTF-8 text content of the file. */
+  content: string;
+}
+
+/** Full skill data retained internally throughout the build process. */
+export interface ResolvedSkill {
+  /** Validated skill name. */
   name: string;
   /** Original title from frontmatter. */
   title: string;
   /** Skill description. */
   description: string;
-  /** Optional spec fields forwarded to the output SKILL.md. */
+  /** Category string, "/" separated. Empty string when uncategorized. */
+  category: string;
+  /** Starlight page URL for the original authored page (e.g. "/guides/react/"). */
+  sourceUrl: string;
+  /** Generated skill page URL (e.g. "/__skills/react/"). */
+  skillPageUrl: string;
+  /** Absolute path to the source markdown file. */
+  filePath: string;
+  /** Raw file content including frontmatter — for SKILL.md generation only. */
+  rawContent: string;
+  /** Markdown body without frontmatter — rendered on skill pages. */
+  bodyContent: string;
+  /** Resolved companion files. */
+  subfiles: ResolvedSubfile[];
+  /** Optional spec fields forwarded to SKILL.md. */
   license?: string;
   compatibility?: string;
   metadata?: Record<string, string>;
   allowedTools?: string;
-  /**
-   * Category string, "/" separated (e.g. "development/frontend").
-   * Empty string when uncategorized.
-   */
-  category: string;
-  /** Starlight page URL for this skill (e.g. "/skills/frontend/react-component/"). */
-  url: string;
-  /** Absolute path to the source markdown file. */
-  filePath: string;
-  /** Raw file content (including frontmatter) for build-time processing. */
-  rawContent: string;
-  /** Markdown body without frontmatter. */
-  bodyContent: string;
-  /** Glob patterns for subfiles, relative to the source file's directory. */
-  subfiles: string[];
 }
 
-/** Plugin configuration options. */
+// ---------------------------------------------------------------------------
+// Public skill data (exposed via virtual module, safe for client bundles)
+// ---------------------------------------------------------------------------
+
+/**
+ * Skill data exposed to page components via `virtual:starlight-skills/data`.
+ * Excludes absolute file paths and raw source content.
+ */
+export interface SkillData {
+  name: string;
+  title: string;
+  description: string;
+  category: string;
+  /** URL of the original authored documentation page. */
+  sourceUrl: string;
+  /** URL of the generated skill page (under skillsRoot). */
+  skillPageUrl: string;
+  /** Markdown body content, for rendering on the skill page. */
+  bodyContent: string;
+  /** Companion file metadata (no absolute paths). */
+  subfiles: Array<{
+    relativePath: string;
+    ext: string;
+    content: string;
+    /** Viewer page URL under the skill page. */
+    viewerUrl: string;
+  }>;
+  license?: string;
+  compatibility?: string;
+  metadata?: Record<string, string>;
+  allowedTools?: string;
+}
+
+// ---------------------------------------------------------------------------
+// Plugin options
+// ---------------------------------------------------------------------------
+
 export interface StarlightSkillsOptions {
   /**
-   * How to auto-detect `skill-category` when not set in frontmatter.
-   * - `'path'`  — derived from the file's directory path relative to content/docs
-   * - `'slug'`  — derived from the URL slug segments
-   * - `false`   — disabled; category is only taken from frontmatter
-   * @default 'path'
+   * Target locale for skill discovery when Starlight i18n is enabled.
+   * Only pages under this locale's content directory are processed.
+   * Defaults to the Starlight default locale.
    */
-  autoCategoryMode?: 'path' | 'slug' | false;
+  targetLocale?: string;
 
   /**
-   * URL path for the generated skills catalog page.
-   * @default '/skills-catalog'
+   * Where to write skill files at build time.
+   * - `'well-known-endpoint'` — `dist/.well-known/skills/` only (HTTP discovery)
+   * - `'collocated'`          — `<projectRoot>/skills/` only (VCS-friendly)
+   * - `'both'`                — both outputs
+   * @default 'both'
    */
-  catalogPath?: string;
+  outputMode?: 'well-known-endpoint' | 'collocated' | 'both';
+
+  /**
+   * Controls which pages the plugin generates.
+   * @default { skill: true, catalog: true }
+   */
+  autoGeneratePages?: {
+    /** Generate a dedicated skill page at `/<skillsRoot>/<skill-name>`. */
+    skill?: boolean;
+    /** Generate the skills catalog page at `/<skillsRoot>/`. */
+    catalog?: boolean;
+  };
+
+  /**
+   * Base URL path for all plugin-generated pages.
+   * Must not conflict with existing content pages.
+   * @default '__skills'
+   */
+  skillsRoot?: string;
+
+  /**
+   * How hierarchical categories are displayed in the catalog.
+   * - `'nested'` — nest sub-categories under their parent section
+   * - `'flat'`   — show full category path as a flat section label
+   * @default 'nested'
+   */
+  catalogCategoryDisplay?: 'nested' | 'flat';
+
+  /**
+   * How to auto-detect `skill-category` when not set in frontmatter.
+   * - `'path'` — derived from file's directory path relative to content root
+   * - `false`  — disabled; category is taken from frontmatter only
+   * @default 'path'
+   */
+  autoCategoryMode?: 'path' | false;
 
   /**
    * Sidebar group label for the Skills section.
    * @default 'Skills'
    */
   sidebarLabel?: string;
+
+  /**
+   * Output directory for `collocated` (and `both`) output mode.
+   * Accepts a path relative to the Astro project root, or an absolute path.
+   * Useful in monorepos where the project root is not the repository root.
+   * @example '../../skills'   // two levels up from the Astro package
+   * @default 'skills'
+   */
+  collocatedDir?: string;
 }
+
+/** Fully resolved options with all defaults applied. */
+export type ResolvedOptions = Required<StarlightSkillsOptions> & {
+  autoGeneratePages: Required<NonNullable<StarlightSkillsOptions['autoGeneratePages']>>;
+};

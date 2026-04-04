@@ -1,21 +1,48 @@
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import type { StarlightPlugin } from '@astrojs/starlight/types';
+import type { AstroIntegration, AstroConfig, AstroIntegrationLogger } from 'astro';
+import type { StarlightPlugin, StarlightUserConfig } from '@astrojs/starlight/types';
 import { discoverSkills } from './utils/discovery.js';
 import { starlightSkillsIntegration } from './integration.js';
-import type { SkillData, StarlightSkillsOptions } from './types.js';
+import type {
+  ResolvedSkill,
+  ResolvedOptions,
+  SkillData,
+  StarlightSkillsOptions,
+} from './types.js';
 
-export type { SkillData, StarlightSkillsOptions, SkillFrontmatter } from './types.js';
+export type {
+  SkillData,
+  StarlightSkillsOptions,
+  SkillFrontmatter,
+  ResolvedOptions,
+} from './types.js';
 
 // ---------------------------------------------------------------------------
 // Defaults
 // ---------------------------------------------------------------------------
 
-const DEFAULTS: Required<StarlightSkillsOptions> = {
+const DEFAULTS: ResolvedOptions = {
+  targetLocale: '',
+  outputMode: 'both',
+  autoGeneratePages: { skill: true, catalog: true },
+  skillsRoot: '__skills',
+  catalogCategoryDisplay: 'nested',
   autoCategoryMode: 'path',
-  catalogPath: '/skills-catalog',
   sidebarLabel: 'Skills',
+  collocatedDir: 'skills',
 };
+
+function resolveOptions(userOptions: StarlightSkillsOptions): ResolvedOptions {
+  return {
+    ...DEFAULTS,
+    ...userOptions,
+    autoGeneratePages: {
+      ...DEFAULTS.autoGeneratePages,
+      ...userOptions.autoGeneratePages,
+    },
+  };
+}
 
 // ---------------------------------------------------------------------------
 // Sidebar helpers
@@ -23,48 +50,96 @@ const DEFAULTS: Required<StarlightSkillsOptions> = {
 
 type SidebarItem =
   | { label: string; link: string }
-  | { label: string; items: SidebarItem[] };
+  | { label: string; items: SidebarItem[]; collapsed?: boolean };
 
-/** Build a nested sidebar group from the discovered skills. */
-function buildSidebarGroup(
-  skills: SkillData[],
-  label: string,
-): { label: string; items: SidebarItem[] } {
-  // Group by top-level category
-  const byCategory = new Map<string, SkillData[]>();
+function buildSidebarItems(
+  skills: ResolvedSkill[],
+  options: ResolvedOptions,
+): SidebarItem[] {
+  const useSkillPage = options.autoGeneratePages.skill;
+
+  const linkFor = (skill: ResolvedSkill): SidebarItem => ({
+    label: skill.name,
+    link: useSkillPage ? skill.skillPageUrl : skill.sourceUrl,
+  });
+
+  // Group by category
+  const byCategory = new Map<string, ResolvedSkill[]>();
+  const uncategorised: ResolvedSkill[] = [];
+
   for (const skill of skills) {
-    const cat = skill.category || '';
-    if (!byCategory.has(cat)) byCategory.set(cat, []);
-    byCategory.get(cat)!.push(skill);
+    if (!skill.category) {
+      uncategorised.push(skill);
+    } else {
+      const arr = byCategory.get(skill.category) ?? [];
+      arr.push(skill);
+      byCategory.set(skill.category, arr);
+    }
   }
 
   const items: SidebarItem[] = [];
 
-  for (const [cat, catSkills] of byCategory) {
-    const links: SidebarItem[] = catSkills.map((s) => ({
-      label: s.title,
-      link: s.url,
-    }));
+  // Build nested category tree
+  const catMap = new Map<string, SidebarItem & { items: SidebarItem[] }>();
 
-    if (cat === '') {
-      // Uncategorised skills go directly into the Skills group
-      items.push(...links);
+  const ensureCatItem = (cat: string): SidebarItem & { items: SidebarItem[] } => {
+    if (catMap.has(cat)) return catMap.get(cat)!;
+    const segments = cat.split('/');
+    const label = segments[segments.length - 1]!;
+    const node: SidebarItem & { items: SidebarItem[] } = {
+      label,
+      items: [],
+      collapsed: true,
+    };
+    catMap.set(cat, node);
+
+    if (segments.length > 1) {
+      const parentCat = segments.slice(0, -1).join('/');
+      const parent = ensureCatItem(parentCat);
+      parent.items.push(node);
     } else {
-      // Each category segment creates a nested group
-      const segments = cat.split('/').filter(Boolean);
-      // Nest from deepest up
-      let group: SidebarItem = {
-        label: segments[segments.length - 1]!,
-        items: links,
-      };
-      for (let i = segments.length - 2; i >= 0; i--) {
-        group = { label: segments[i]!, items: [group] };
-      }
-      items.push(group);
+      items.push(node);
+    }
+    return node;
+  };
+
+  for (const [cat, catSkills] of [...byCategory.entries()].sort()) {
+    const catItem = ensureCatItem(cat);
+    for (const skill of catSkills) {
+      catItem.items.push(linkFor(skill));
     }
   }
 
-  return { label, items };
+  // Uncategorised go directly under the root group
+  for (const skill of uncategorised) {
+    items.push(linkFor(skill));
+  }
+
+  return items;
+}
+
+function buildSidebarGroup(
+  skills: ResolvedSkill[],
+  options: ResolvedOptions,
+): { label: string; items: SidebarItem[] } {
+  return {
+    label: options.sidebarLabel,
+    items: buildSidebarItems(skills, options),
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Plugin hook parameter type
+// ---------------------------------------------------------------------------
+
+interface ConfigSetupParameter {
+  config: StarlightUserConfig;
+  updateConfig: (newConfig: Partial<StarlightUserConfig>) => void;
+  addIntegration: (integration: AstroIntegration) => void;
+  astroConfig: AstroConfig;
+  command: 'dev' | 'build' | 'preview';
+  isRestart: boolean;
+  logger: AstroIntegrationLogger;
 }
 
 // ---------------------------------------------------------------------------
@@ -74,25 +149,16 @@ function buildSidebarGroup(
 /**
  * `starlight-skills` — Starlight plugin
  *
- * Turns skill-annotated documentation pages into distributable AI skills:
- *
- * - Adds a sidebar group listing all skills
- * - Injects a `/skills-catalog` page with a searchable skill table
- * - On `astro build`, writes:
- *   - `dist/.well-known/skills/` (discovery endpoint for `npx skills add`)
- *   - `skills/` in the project root (committed companion files)
+ * Recognises `skill: true` pages in `src/content/docs` and:
+ *  - Adds a Skills sidebar group
+ *  - Generates a catalog page at `/<skillsRoot>/`
+ *  - Generates individual skill pages at `/<skillsRoot>/<name>`
+ *  - Writes Agent Skills–compliant output at build time
  */
 export default function starlightSkills(
   userOptions: StarlightSkillsOptions = {},
 ): StarlightPlugin {
-  const options: Required<StarlightSkillsOptions> = {
-    ...DEFAULTS,
-    ...userOptions,
-  };
-
-  // Path to the pages/ directory shipped with this package.
-  // After compilation: dist/index.js → ../pages/
-  const pagesDir = new URL('../pages/', import.meta.url);
+  const options = resolveOptions(userOptions);
 
   return {
     name: 'starlight-skills',
@@ -101,22 +167,19 @@ export default function starlightSkills(
         config,
         updateConfig,
         addIntegration,
-        injectRoute,
         astroConfig,
         logger,
-      }) => {
-        // Resolve content/docs directory
+      }: ConfigSetupParameter) => {
         const srcDir = fileURLToPath(astroConfig.srcDir);
         const contentDocsDir = path.join(srcDir, 'content', 'docs');
 
-        // Discover skill files
-        let skills: SkillData[] = [];
+        // Discover skills
+        let skills: ResolvedSkill[] = [];
         try {
           skills = await discoverSkills(contentDocsDir, options);
         } catch (err) {
-          logger.warn(
-            `Could not scan content directory (${contentDocsDir}): ${String(err)}`,
-          );
+          // Re-throw AstroErrors (e.g. duplicate names, binary files)
+          throw err;
         }
 
         if (skills.length === 0) {
@@ -127,24 +190,25 @@ export default function starlightSkills(
           logger.info(`Found ${skills.length} skill(s).`);
         }
 
-        // Register Astro integration (Vite virtual module + build output)
-        addIntegration(starlightSkillsIntegration(options, skills));
+        // Collect non-root locale prefixes so the integration can inject
+        // locale-prefixed routes (e.g. /ja/__skills/...) alongside the bare
+        // root routes. Starlight auto-prefixes sidebar links with the active
+        // locale, so those paths must exist to avoid 404s.
+        const localePrefixes = Object.keys(config.locales ?? {}).filter(
+          (k) => k !== 'root',
+        );
 
-        // Inject the catalog page
-        injectRoute({
-          pattern: options.catalogPath,
-          entrypoint: fileURLToPath(new URL('catalog.astro', pagesDir)),
-          prerender: true,
-        });
+        // Register Astro integration (routes, virtual module, build output)
+        addIntegration(starlightSkillsIntegration(options, skills, localePrefixes));
 
-        // Add Skills sidebar group if we have skills
+        // Add Skills sidebar group
         if (skills.length > 0) {
-          const skillsGroup = buildSidebarGroup(skills, options.sidebarLabel);
+          const skillsGroup = buildSidebarGroup(skills, options);
           updateConfig({
             sidebar: [...(config.sidebar ?? []), skillsGroup],
           });
         }
       },
     },
-  };
+  } satisfies StarlightPlugin;
 }

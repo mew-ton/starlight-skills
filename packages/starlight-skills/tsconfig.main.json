@@ -1,9 +1,9 @@
 {
   "extends": "@tsconfig/strictest",
   "compilerOptions": {
-    "module": "esnext",
-    "moduleResolution": "nodenext",
+    "module": "nodenext",
     "composite": true,
+    "noEmit": false
   },
   "include": ["src/**/*"]
 }

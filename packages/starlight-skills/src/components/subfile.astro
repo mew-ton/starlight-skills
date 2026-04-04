@@ -1,0 +1,79 @@
+---
+/**
+ * Subfile viewer page — injected at /<skillsRoot>/[skill]/[...subfilePath].
+ *
+ * - Markdown / MDX files are rendered as HTML prose.
+ * - All other text files are displayed as a syntax-highlighted code block.
+ * - Not shown in the sidebar.
+ * - noindex to prevent duplicate-content issues.
+ */
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { marked } from 'marked';
+import { skills } from 'virtual:starlight-skills/data';
+
+export function getStaticPaths() {
+  const paths: Array<{
+    params: { skill: string; subfilePath: string };
+    props: {
+      skillName: string;
+      relativePath: string;
+      ext: string;
+      content: string;
+    };
+  }> = [];
+
+  for (const skill of skills) {
+    for (const sf of skill.subfiles) {
+      paths.push({
+        params: { skill: skill.name, subfilePath: sf.relativePath },
+        props: {
+          skillName: skill.name,
+          relativePath: sf.relativePath,
+          ext: sf.ext,
+          content: sf.content,
+        },
+      });
+    }
+  }
+
+  return paths;
+}
+
+type Props = {
+  skillName: string;
+  relativePath: string;
+  ext: string;
+  content: string;
+};
+
+const { skillName, relativePath, ext, content } = Astro.props;
+
+const MARKDOWN_EXTS = new Set(['md', 'mdx', 'markdown']);
+const isMarkdown = MARKDOWN_EXTS.has(ext);
+
+const bodyHtml = isMarkdown
+  ? await marked.parse(content, { async: true })
+  : null;
+
+// Infer language for syntax highlighting from extension
+const language = ext || 'text';
+---
+
+<StarlightPage
+  frontmatter={{
+    title: relativePath,
+    description: `Companion file for the "${skillName}" skill.`,
+    head: [{ tag: 'meta', attrs: { name: 'robots', content: 'noindex' } }],
+    sidebar: { hidden: true },
+  }}
+>
+  <p>
+    Companion file of skill <a href={`../../${skillName}/`}><code>{skillName}</code></a>.
+  </p>
+
+  {isMarkdown ? (
+    <div class="sl-markdown-content" set:html={bodyHtml} />
+  ) : (
+    <pre class={`language-${language}`}><code class={`language-${language}`} set:text={content} /></pre>
+  )}
+</StarlightPage>

@@ -141,5 +141,5 @@ vite.config.ts.timestamp-*
 # Turbo
 .turbo/
 
-# Claude
-.claude/
+# Astro
+.astro/
