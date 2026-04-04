@@ -131,6 +131,7 @@ const bodyHtml = await marked.parse(skill.bodyContent, { async: true });
   .sl-skill-meta {
     display: grid;
     grid-template-columns: max-content 1fr;
+    align-items: baseline;
     gap: 0.25rem 1.5rem;
     background: var(--sl-color-gray-6);
     border: 1px solid var(--sl-color-gray-5);
@@ -139,11 +140,12 @@ const bodyHtml = await marked.parse(skill.bodyContent, { async: true });
     margin-block-end: 1.5rem;
   }
   .sl-skill-meta dt {
+    grid-column: 1;
     font-weight: 600;
     color: var(--sl-color-gray-2);
-    font-size: var(--sl-text-sm);
   }
   .sl-skill-meta dd {
+    grid-column: 2;
     margin: 0;
   }
   .sl-skill-metadata-inner {
