@@ -3,6 +3,8 @@ import starlight from '@astrojs/starlight';
 import starlightSkills from "starlight-skills"
 
 export default defineConfig({
+	site: 'https://mew-ton.github.io',
+	base: '/starlight-skills',
 	integrations: [
 		starlight({
 			title: 'starlight-skills',

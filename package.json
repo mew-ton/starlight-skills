@@ -12,7 +12,8 @@
     "preview": "turbo preview --filter=docs",
     "lint": "biome lint .",
     "format": "biome format . --write",
-    "check": "biome check . --write"
+    "check": "biome check . --write",
+    "release": "pnpm publish -r --access public"
   },
   "devDependencies": {
     "@biomejs/biome": "catalog:",
