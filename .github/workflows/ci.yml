@@ -7,33 +7,41 @@ on:
     branches: ["main"]
 
 jobs:
-  build:
-    name: Build & Lint
+  lint:
+    name: Lint & Format
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10.32.1
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: "pnpm"
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
+      
+      - name: Setup Environment
+        uses: ./.github/actions/node-setup
+      
       - name: Code Quality (Biome)
         run: pnpm exec biome ci .
 
+  typecheck:
+    name: Typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Environment
+        uses: ./.github/actions/node-setup
+
       - name: Typecheck
         run: pnpm run typecheck
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Environment
+        uses: ./.github/actions/node-setup
 
       - name: Build
         run: pnpm run build
