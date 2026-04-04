@@ -1,0 +1,9 @@
+{
+  "extends": "@tsconfig/strictest",
+  "compilerOptions": {
+    "module": "nodenext",
+    "composite": true,
+    "noEmit": false
+  },
+  "include": ["**/*.test.ts"]
+}

@@ -136,6 +136,14 @@ export async function discoverSkills(
       continue;
     }
 
+    // --- Description (required) ---
+    if (!fm.description?.trim()) {
+      throw new AstroError(
+        `Skill "${skillName}" in ${filePath} is missing a required \`description\` field.`,
+        'Add a `description` to the frontmatter. It is shown in the catalog and forwarded to the SKILL.md output.',
+      );
+    }
+
     // --- Category ---
     let category = fm['skill-category'] ?? '';
     if (!category && options.autoCategoryMode === 'path') {

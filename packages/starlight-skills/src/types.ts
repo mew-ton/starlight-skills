@@ -25,8 +25,11 @@ export interface SkillFrontmatter {
    * in the skill distribution (e.g. "references/*.md", "scripts/*.js").
    */
   subfiles?: string[];
-  /** Human-readable description. Used in the catalog table and as the skill description. */
-  description?: string;
+  /**
+   * Human-readable description. Used in the catalog table and forwarded to SKILL.md.
+   * Required when `skill: true` — omitting it is a build error.
+   */
+  description: string;
   /** Page title — fallback source for `skill-name` when omitted. */
   title?: string;
 
