@@ -2,9 +2,13 @@ import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import starlightSkills from "starlight-skills"
 
+const isCI = !!process.env.CI;
+
 export default defineConfig({
-	site: 'https://mew-ton.github.io',
-	base: '/starlight-skills',
+	...(isCI && {
+		site: 'https://mew-ton.github.io',
+		base: '/starlight-skills',
+	}),
 	integrations: [
 		starlight({
 			title: 'starlight-skills',
