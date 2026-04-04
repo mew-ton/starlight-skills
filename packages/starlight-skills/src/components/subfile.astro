@@ -1,4 +1,5 @@
 ---
+import { skills } from 'virtual:starlight-skills/data';
 /**
  * Subfile viewer page — injected at /<skillsRoot>/[skill]/[...subfilePath].
  *
@@ -9,7 +10,6 @@
  */
 import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 import { marked } from 'marked';
-import { skills } from 'virtual:starlight-skills/data';
 
 export function getStaticPaths() {
   const paths: Array<{
@@ -51,9 +51,7 @@ const { skillName, relativePath, ext, content } = Astro.props;
 const MARKDOWN_EXTS = new Set(['md', 'mdx', 'markdown']);
 const isMarkdown = MARKDOWN_EXTS.has(ext);
 
-const bodyHtml = isMarkdown
-  ? await marked.parse(content, { async: true })
-  : null;
+const bodyHtml = isMarkdown ? await marked.parse(content, { async: true }) : null;
 
 // Infer language for syntax highlighting from extension
 const language = ext || 'text';

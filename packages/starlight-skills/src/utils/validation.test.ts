@@ -147,20 +147,33 @@ describe('checkDuplicateSkillNames', () => {
 
 describe('isBinaryFile', () => {
   describe('extension-based detection', () => {
-    it.each(['png', 'jpg', 'jpeg', 'gif', 'webp', 'pdf', 'zip', 'mp4', 'woff2'])(
-      'should return true for .%s files',
-      (ext) => {
-        expect(isBinaryFile(`/fake/file.${ext}`)).toBe(true);
-      },
-    );
+    it.each([
+      'png',
+      'jpg',
+      'jpeg',
+      'gif',
+      'webp',
+      'pdf',
+      'zip',
+      'mp4',
+      'woff2',
+    ])('should return true for .%s files', (ext) => {
+      expect(isBinaryFile(`/fake/file.${ext}`)).toBe(true);
+    });
 
-    it.each(['ts', 'js', 'md', 'mdx', 'json', 'txt', 'css', 'html'])(
-      'should return false for .%s files (extension)',
-      (ext) => {
-        // File does not exist → readFileSync throws → returns false
-        expect(isBinaryFile(`/nonexistent/file.${ext}`)).toBe(false);
-      },
-    );
+    it.each([
+      'ts',
+      'js',
+      'md',
+      'mdx',
+      'json',
+      'txt',
+      'css',
+      'html',
+    ])('should return false for .%s files (extension)', (ext) => {
+      // File does not exist → readFileSync throws → returns false
+      expect(isBinaryFile(`/nonexistent/file.${ext}`)).toBe(false);
+    });
   });
 
   describe('null-byte detection', () => {

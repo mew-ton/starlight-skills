@@ -1,4 +1,5 @@
 ---
+import { options, skills } from 'virtual:starlight-skills/data';
 /**
  * Skills Catalog page — injected by the starlight-skills plugin at /<skillsRoot>/.
  *
@@ -6,7 +7,6 @@
  * noindex is set to prevent duplicate-content SEO issues.
  */
 import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
-import { skills, options } from 'virtual:starlight-skills/data';
 
 // ----------------------------------------------------------------
 // Types
@@ -33,7 +33,7 @@ interface SectionRow {
 
 const useSkillPage = options.autoGeneratePages.skill;
 
-function makeEntry(skill: typeof skills[number]): SkillEntry {
+function makeEntry(skill: (typeof skills)[number]): SkillEntry {
   return {
     name: skill.name,
     title: skill.title,

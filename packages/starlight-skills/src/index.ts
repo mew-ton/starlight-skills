@@ -1,21 +1,16 @@
-import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import type { AstroIntegration, AstroConfig, AstroIntegrationLogger } from 'astro';
+import { fileURLToPath } from 'node:url';
 import type { StarlightPlugin, StarlightUserConfig } from '@astrojs/starlight/types';
-import { discoverSkills } from './utils/discovery.js';
+import type { AstroConfig, AstroIntegration, AstroIntegrationLogger } from 'astro';
 import { starlightSkillsIntegration } from './integration.js';
-import type {
-  ResolvedSkill,
-  ResolvedOptions,
-  SkillData,
-  StarlightSkillsOptions,
-} from './types.js';
+import type { ResolvedOptions, ResolvedSkill, StarlightSkillsOptions } from './types.js';
+import { discoverSkills } from './utils/discovery.js';
 
 export type {
-  SkillData,
-  StarlightSkillsOptions,
-  SkillFrontmatter,
   ResolvedOptions,
+  SkillData,
+  SkillFrontmatter,
+  StarlightSkillsOptions,
 } from './types.js';
 
 // ---------------------------------------------------------------------------
@@ -52,10 +47,7 @@ type SidebarItem =
   | { label: string; link: string }
   | { label: string; items: SidebarItem[]; collapsed?: boolean };
 
-function buildSidebarItems(
-  skills: ResolvedSkill[],
-  options: ResolvedOptions,
-): SidebarItem[] {
+function buildSidebarItems(skills: ResolvedSkill[], options: ResolvedOptions): SidebarItem[] {
   const useSkillPage = options.autoGeneratePages.skill;
 
   const linkFor = (skill: ResolvedSkill): SidebarItem => ({
@@ -155,9 +147,7 @@ interface ConfigSetupParameter {
  *  - Generates individual skill pages at `/<skillsRoot>/<name>`
  *  - Writes Agent Skills–compliant output at build time
  */
-export default function starlightSkills(
-  userOptions: StarlightSkillsOptions = {},
-): StarlightPlugin {
+export default function starlightSkills(userOptions: StarlightSkillsOptions = {}): StarlightPlugin {
   const options = resolveOptions(userOptions);
 
   return {
@@ -175,17 +165,10 @@ export default function starlightSkills(
 
         // Discover skills
         let skills: ResolvedSkill[] = [];
-        try {
-          skills = await discoverSkills(contentDocsDir, options);
-        } catch (err) {
-          // Re-throw AstroErrors (e.g. duplicate names, binary files)
-          throw err;
-        }
+        skills = await discoverSkills(contentDocsDir, options);
 
         if (skills.length === 0) {
-          logger.warn(
-            'No skills found. Add `skill: true` to the frontmatter of skill pages.',
-          );
+          logger.warn('No skills found. Add `skill: true` to the frontmatter of skill pages.');
         } else {
           logger.info(`Found ${skills.length} skill(s).`);
         }
@@ -194,9 +177,7 @@ export default function starlightSkills(
         // locale-prefixed routes (e.g. /ja/__skills/...) alongside the bare
         // root routes. Starlight auto-prefixes sidebar links with the active
         // locale, so those paths must exist to avoid 404s.
-        const localePrefixes = Object.keys(config.locales ?? {}).filter(
-          (k) => k !== 'root',
-        );
+        const localePrefixes = Object.keys(config.locales ?? {}).filter((k) => k !== 'root');
 
         // Register Astro integration (routes, virtual module, build output)
         addIntegration(starlightSkillsIntegration(options, skills, localePrefixes));

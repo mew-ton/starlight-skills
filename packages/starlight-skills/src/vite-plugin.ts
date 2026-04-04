@@ -1,8 +1,8 @@
 import type { Plugin } from 'vite';
-import type { ResolvedSkill, SkillData, ResolvedOptions } from './types.js';
+import type { ResolvedOptions, ResolvedSkill, SkillData } from './types.js';
 
 export const VIRTUAL_MODULE_ID = 'virtual:starlight-skills/data';
-const RESOLVED_ID = '\0' + VIRTUAL_MODULE_ID;
+const RESOLVED_ID = `\0${VIRTUAL_MODULE_ID}`;
 
 /**
  * Map internal ResolvedSkill to the public SkillData shape,

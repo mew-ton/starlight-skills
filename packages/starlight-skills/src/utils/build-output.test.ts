@@ -66,15 +66,18 @@ describe('writeBuildOutput', () => {
   });
 
   it('should produce no output for an empty skills list', async () => {
-    await expect(
-      writeBuildOutput([], makeOptions(), distDir, projectDir),
-    ).resolves.toBeUndefined();
+    await expect(writeBuildOutput([], makeOptions(), distDir, projectDir)).resolves.toBeUndefined();
   });
 
   describe('collocated mode', () => {
     it('should write SKILL.md under <collocatedDir>/<name>/', async () => {
       const skill = makeSkill();
-      await writeBuildOutput([skill], makeOptions({ outputMode: 'collocated' }), distDir, projectDir);
+      await writeBuildOutput(
+        [skill],
+        makeOptions({ outputMode: 'collocated' }),
+        distDir,
+        projectDir,
+      );
 
       const skillMd = readText(join(projectDir, 'skills', 'my-skill', 'SKILL.md'));
       expect(skillMd).toContain('name: my-skill');
@@ -82,7 +85,12 @@ describe('writeBuildOutput', () => {
 
     it('should include description in the SKILL.md frontmatter', async () => {
       const skill = makeSkill({ description: 'A test skill.' });
-      await writeBuildOutput([skill], makeOptions({ outputMode: 'collocated' }), distDir, projectDir);
+      await writeBuildOutput(
+        [skill],
+        makeOptions({ outputMode: 'collocated' }),
+        distDir,
+        projectDir,
+      );
 
       const skillMd = readText(join(projectDir, 'skills', 'my-skill', 'SKILL.md'));
       expect(skillMd).toContain('"A test skill."');
@@ -90,7 +98,12 @@ describe('writeBuildOutput', () => {
 
     it('should include body content after the frontmatter', async () => {
       const skill = makeSkill({ bodyContent: 'Do the thing.\n' });
-      await writeBuildOutput([skill], makeOptions({ outputMode: 'collocated' }), distDir, projectDir);
+      await writeBuildOutput(
+        [skill],
+        makeOptions({ outputMode: 'collocated' }),
+        distDir,
+        projectDir,
+      );
 
       const skillMd = readText(join(projectDir, 'skills', 'my-skill', 'SKILL.md'));
       expect(skillMd).toContain('Do the thing.');
@@ -111,17 +124,31 @@ describe('writeBuildOutput', () => {
 
     it('should not create .well-known in dist', async () => {
       const skill = makeSkill();
-      await writeBuildOutput([skill], makeOptions({ outputMode: 'collocated' }), distDir, projectDir);
+      await writeBuildOutput(
+        [skill],
+        makeOptions({ outputMode: 'collocated' }),
+        distDir,
+        projectDir,
+      );
 
       expect(() => readText(join(distDir, '.well-known', 'skills', 'index.json'))).toThrow();
     });
 
     it('should write multiple skills', async () => {
       const skills = [makeSkill({ name: 'skill-a' }), makeSkill({ name: 'skill-b' })];
-      await writeBuildOutput([...skills], makeOptions({ outputMode: 'collocated' }), distDir, projectDir);
+      await writeBuildOutput(
+        [...skills],
+        makeOptions({ outputMode: 'collocated' }),
+        distDir,
+        projectDir,
+      );
 
-      expect(readText(join(projectDir, 'skills', 'skill-a', 'SKILL.md'))).toContain('name: skill-a');
-      expect(readText(join(projectDir, 'skills', 'skill-b', 'SKILL.md'))).toContain('name: skill-b');
+      expect(readText(join(projectDir, 'skills', 'skill-a', 'SKILL.md'))).toContain(
+        'name: skill-a',
+      );
+      expect(readText(join(projectDir, 'skills', 'skill-b', 'SKILL.md'))).toContain(
+        'name: skill-b',
+      );
     });
 
     it('should include optional fields when present', async () => {
@@ -131,7 +158,12 @@ describe('writeBuildOutput', () => {
         allowedTools: 'Bash Read',
         metadata: { version: '1.0' },
       });
-      await writeBuildOutput([skill], makeOptions({ outputMode: 'collocated' }), distDir, projectDir);
+      await writeBuildOutput(
+        [skill],
+        makeOptions({ outputMode: 'collocated' }),
+        distDir,
+        projectDir,
+      );
 
       const skillMd = readText(join(projectDir, 'skills', 'my-skill', 'SKILL.md'));
       expect(skillMd).toContain('license: MIT');
@@ -202,8 +234,12 @@ describe('writeBuildOutput', () => {
       const skill = makeSkill();
       await writeBuildOutput([skill], makeOptions({ outputMode: 'both' }), distDir, projectDir);
 
-      expect(readText(join(projectDir, 'skills', 'my-skill', 'SKILL.md'))).toContain('name: my-skill');
-      expect(readText(join(distDir, '.well-known', 'skills', 'my-skill', 'SKILL.md'))).toContain('name: my-skill');
+      expect(readText(join(projectDir, 'skills', 'my-skill', 'SKILL.md'))).toContain(
+        'name: my-skill',
+      );
+      expect(readText(join(distDir, '.well-known', 'skills', 'my-skill', 'SKILL.md'))).toContain(
+        'name: my-skill',
+      );
     });
   });
 });

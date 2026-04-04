@@ -53,5 +53,7 @@
     "tsdown": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
-  }
+  },
+  "author": "mew-ton",
+  "license": "MIT"
 }

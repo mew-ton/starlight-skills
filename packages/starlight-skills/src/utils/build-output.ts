@@ -1,6 +1,6 @@
 import { copyFile, mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import type { ResolvedSkill, ResolvedOptions } from '../types.js';
+import type { ResolvedOptions, ResolvedSkill } from '../types.js';
 
 // ---------------------------------------------------------------------------
 // SKILL.md generation
@@ -36,9 +36,7 @@ function buildSkillMarkdown(skill: ResolvedSkill): string {
   lines.push('---');
 
   // Ensure a blank line between frontmatter and body
-  const body = skill.bodyContent.startsWith('\n')
-    ? skill.bodyContent
-    : '\n' + skill.bodyContent;
+  const body = skill.bodyContent.startsWith('\n') ? skill.bodyContent : `\n${skill.bodyContent}`;
   lines.push(body);
 
   return lines.join('\n');

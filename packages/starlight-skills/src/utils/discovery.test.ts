@@ -1,4 +1,4 @@
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
@@ -70,7 +70,11 @@ describe('discoverSkills', () => {
   });
 
   it('should throw when description is blank', async () => {
-    write(docsDir, 'blank-desc.md', '---\nskill: true\ntitle: Blank\ndescription: "   "\n---\nBody.');
+    write(
+      docsDir,
+      'blank-desc.md',
+      '---\nskill: true\ntitle: Blank\ndescription: "   "\n---\nBody.',
+    );
     await expect(discoverSkills(docsDir, makeOptions())).rejects.toThrow('description');
   });
 

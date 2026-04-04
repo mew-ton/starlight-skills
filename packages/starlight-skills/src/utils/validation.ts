@@ -18,10 +18,7 @@ const SKILL_NAME_REGEX = /^[a-z0-9]([a-z0-9-]*[a-z0-9])?$/;
 
 export function isValidSkillName(name: string): boolean {
   return (
-    name.length >= 1 &&
-    name.length <= 64 &&
-    SKILL_NAME_REGEX.test(name) &&
-    !name.includes('--')
+    name.length >= 1 && name.length <= 64 && SKILL_NAME_REGEX.test(name) && !name.includes('--')
   );
 }
 
@@ -45,9 +42,7 @@ export function titleToSkillName(title: string): string {
 /**
  * Throws an AstroError if any two skills share the same name.
  */
-export function checkDuplicateSkillNames(
-  skills: Pick<ResolvedSkill, 'name' | 'filePath'>[],
-): void {
+export function checkDuplicateSkillNames(skills: Pick<ResolvedSkill, 'name' | 'filePath'>[]): void {
   const seen = new Map<string, string>();
   for (const skill of skills) {
     const existing = seen.get(skill.name);
@@ -66,13 +61,47 @@ export function checkDuplicateSkillNames(
 // ---------------------------------------------------------------------------
 
 const BINARY_EXTENSIONS = new Set([
-  'png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'ico', 'bmp', 'tiff',
-  'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx',
-  'zip', 'tar', 'gz', 'bz2', 'xz', '7z', 'rar',
-  'mp3', 'mp4', 'wav', 'ogg', 'mov', 'avi', 'mkv',
-  'woff', 'woff2', 'ttf', 'otf', 'eot',
-  'exe', 'dll', 'so', 'dylib',
-  'pyc', 'class',
+  'png',
+  'jpg',
+  'jpeg',
+  'gif',
+  'webp',
+  'svg',
+  'ico',
+  'bmp',
+  'tiff',
+  'pdf',
+  'doc',
+  'docx',
+  'xls',
+  'xlsx',
+  'ppt',
+  'pptx',
+  'zip',
+  'tar',
+  'gz',
+  'bz2',
+  'xz',
+  '7z',
+  'rar',
+  'mp3',
+  'mp4',
+  'wav',
+  'ogg',
+  'mov',
+  'avi',
+  'mkv',
+  'woff',
+  'woff2',
+  'ttf',
+  'otf',
+  'eot',
+  'exe',
+  'dll',
+  'so',
+  'dylib',
+  'pyc',
+  'class',
 ]);
 
 /**
@@ -103,10 +132,7 @@ export function isBinaryFile(absolutePath: string): boolean {
 /**
  * Throws an AstroError if the skillsRoot matches any existing content directory or file.
  */
-export function checkSkillsRootConflict(
-  skillsRoot: string,
-  contentDocsDir: string,
-): void {
+export function checkSkillsRootConflict(skillsRoot: string, contentDocsDir: string): void {
   const dirConflict = path.join(contentDocsDir, skillsRoot);
   if (existsSync(dirConflict)) {
     throw new AstroError(

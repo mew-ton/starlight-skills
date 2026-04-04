@@ -1,10 +1,10 @@
-import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import type { AstroIntegration } from 'astro';
-import { starlightSkillsVitePlugin } from './vite-plugin.js';
+import type { ResolvedOptions, ResolvedSkill } from './types.js';
 import { writeBuildOutput } from './utils/build-output.js';
 import { checkSkillsRootConflict } from './utils/validation.js';
-import type { ResolvedSkill, ResolvedOptions } from './types.js';
+import { starlightSkillsVitePlugin } from './vite-plugin.js';
 
 /** Absolute path to the src/components/ directory shipped with this package. */
 const pagesDir = new URL('../src/components/', import.meta.url);
@@ -58,9 +58,7 @@ export function starlightSkillsIntegration(
         // (e.g. /__skills/foo → /ja/__skills/foo), so the locale-prefixed
         // routes must exist to avoid 404s.
         const root = options.skillsRoot;
-        const routeRoots = ['', ...localePrefixes].map((lp) =>
-          lp ? `${lp}/${root}` : root,
-        );
+        const routeRoots = ['', ...localePrefixes].map((lp) => (lp ? `${lp}/${root}` : root));
         const hasSubfiles = skills.some((s) => s.subfiles.length > 0);
 
         for (const routeRoot of routeRoots) {
@@ -89,9 +87,7 @@ export function starlightSkillsIntegration(
           }
         }
 
-        logger.info(
-          `Injecting skill routes under: ${routeRoots.map((r) => `/${r}`).join(', ')}`,
-        );
+        logger.info(`Injecting skill routes under: ${routeRoots.map((r) => `/${r}`).join(', ')}`);
       },
 
       'astro:build:done': async ({ dir, logger }) => {

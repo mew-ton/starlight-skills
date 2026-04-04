@@ -9,10 +9,14 @@
     "build": "turbo build",
     "dev": "turbo dev",
     "typecheck": "turbo typecheck",
-    "preview": "turbo preview --filter=docs"
+    "preview": "turbo preview --filter=docs",
+    "lint": "biome lint .",
+    "format": "biome format . --write",
+    "check": "biome check . --write"
   },
   "devDependencies": {
-    "turbo": "^2.0.0"
+    "@biomejs/biome": "catalog:",
+    "turbo": "^2.9.3"
   },
   "packageManager": "pnpm@10.32.1"
 }

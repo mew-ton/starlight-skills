@@ -23,15 +23,15 @@ describe('getCategoryFromPath', () => {
   });
 
   it('should strip locale prefix when locale matches the first segment', () => {
-    expect(
-      getCategoryFromPath(`${docsDir}/en/guides/frontend/react.md`, docsDir, 'en'),
-    ).toBe('guides/frontend');
+    expect(getCategoryFromPath(`${docsDir}/en/guides/frontend/react.md`, docsDir, 'en')).toBe(
+      'guides/frontend',
+    );
   });
 
   it('should not strip locale prefix when locale does not match first segment', () => {
-    expect(
-      getCategoryFromPath(`${docsDir}/guides/frontend/react.md`, docsDir, 'en'),
-    ).toBe('guides/frontend');
+    expect(getCategoryFromPath(`${docsDir}/guides/frontend/react.md`, docsDir, 'en')).toBe(
+      'guides/frontend',
+    );
   });
 
   it('should return empty string for a locale-root file (no subdirectory)', () => {
@@ -39,9 +39,7 @@ describe('getCategoryFromPath', () => {
   });
 
   it('should return single segment for a file one level under the locale prefix', () => {
-    expect(getCategoryFromPath(`${docsDir}/ja/guides/intro.md`, docsDir, 'ja')).toBe(
-      'guides',
-    );
+    expect(getCategoryFromPath(`${docsDir}/ja/guides/intro.md`, docsDir, 'ja')).toBe('guides');
   });
 });
 

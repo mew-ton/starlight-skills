@@ -3,19 +3,19 @@ import path from 'node:path';
 import { AstroError } from 'astro/errors';
 import { glob } from 'glob';
 import matter from 'gray-matter';
-import {
-  isValidSkillName,
-  titleToSkillName,
-  checkDuplicateSkillNames,
-  isBinaryFile,
-} from './validation.js';
-import { getCategoryFromPath } from './category.js';
 import type {
+  ResolvedOptions,
   ResolvedSkill,
   ResolvedSubfile,
   SkillFrontmatter,
-  ResolvedOptions,
 } from '../types.js';
+import { getCategoryFromPath } from './category.js';
+import {
+  checkDuplicateSkillNames,
+  isBinaryFile,
+  isValidSkillName,
+  titleToSkillName,
+} from './validation.js';
 
 // ---------------------------------------------------------------------------
 // URL helpers
@@ -155,12 +155,7 @@ export async function discoverSkills(
     const skillPageUrl = `/${options.skillsRoot}/${skillName}/`;
 
     // --- Subfiles ---
-    const subfiles = await resolveSubfiles(
-      fm.subfiles ?? [],
-      filePath,
-      skillName,
-      skillPageUrl,
-    );
+    const subfiles = await resolveSubfiles(fm.subfiles ?? [], filePath, skillName, skillPageUrl);
 
     skills.push({
       name: skillName,
