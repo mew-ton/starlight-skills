@@ -14,9 +14,6 @@
     }
   ],
   "extensions": {
-    "recommendations": [
-      "biomejs.biome",
-      "astro-build.astro-vscode"
-    ]
+    "recommendations": ["biomejs.biome", "astro-build.astro-vscode"]
   }
 }
