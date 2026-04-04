@@ -1,10 +1,9 @@
 ---
 title: Separate UI components
-description: Provides rules for handling interactive frontend components in skill documents. Use this when migrating heavily interactive Astro or React pages into agent skill documents using starlight-skills. Do not use this to format plain text Markdown.
+description: Provides rules for handling interactive frontend components in skill documents. Use this when migrating heavily interactive Astro or React pages into agent skill documents using starlight-skills. Do not use this to format plain text Markdown or configure frontmatter.
 skill: true
+skill-name: starlight-skills-bp-separate-ui
 ---
-
-# Separate UI components
 
 If your documentation relies heavily on interactive UI components, such as live code REPLs, Starlight's `<Tabs>`, or complex MDX layouts, it will introduce massive amounts of noise directly into the LLM's context window.
 

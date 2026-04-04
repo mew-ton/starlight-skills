@@ -1,6 +1,6 @@
 ---
 name: starlight-skills-installation
-description: "Provides installation and basic setup instructions for starlight-skills. Use this when you need to add the plugin to a new Astro Starlight project or configure its initial setup."
+description: "Provides installation and basic setup instructions for starlight-skills. Use this when you need to add the plugin to a new Astro Starlight project or configure its initial setup. Do not use this if the plugin is already installed, or for frontmatter authoring rules."
 ---
 
 Adding `starlight-skills` to your Astro Starlight project is a simple two-step process.

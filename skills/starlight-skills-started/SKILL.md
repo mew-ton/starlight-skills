@@ -1,6 +1,6 @@
 ---
 name: starlight-skills-started
-description: "Provides core concepts and use cases for the starlight-skills plugin. Use this when you need to understand the philosophy or general purpose of dual-publishing documents and skills."
+description: "Provides core concepts and use cases for the starlight-skills plugin. Use this when you need to understand the philosophy or general purpose of dual-publishing documents and skills. Do not use this for installation steps, frontmatter syntax, or configuration options."
 ---
 
 `starlight-skills` is a plugin for [Astro Starlight](https://starlight.astro.build/) that allows documentation authors to centrally manage both documentation pages and **installable AI Agent Skills**.

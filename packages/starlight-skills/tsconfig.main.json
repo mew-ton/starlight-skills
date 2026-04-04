@@ -5,6 +5,6 @@
     "composite": true,
     "noEmit": false
   },
-  "include": ["src/**/*"],
+  "include": ["./visual.d.ts", "src/**/*"],
   "exclude": ["**/*.test.ts"]
 }

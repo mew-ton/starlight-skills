@@ -1,6 +1,6 @@
 ---
 title: Companion Files
-description: Provides instructions on how to use the `subfiles` frontmatter field. Use this when you need to attach external schemas, scripts, or large datasets to a skill without polluting the main markdown file.
+description: "Provides instructions on how to use the `subfiles` frontmatter field. Use this when you need to attach external schemas, scripts, or large datasets to a skill without polluting the main markdown file. Do not use this for main skill body authoring or plugin configuration."
 skill: true
 skill-name: starlight-skills-companion-files
 skill-category: usage
@@ -72,4 +72,4 @@ Separating your skill into the main document and companion `subfiles` offers mas
 - They must be **text files**. Including binary files (like images, zip files, or PDFs) in the matched glob pattern will purposefully trigger a build error to prevent corrupting the AI's string-based payload.
 - Unmatched glob patterns are simply ignored.
 - Over on the doc's website, the plugin automatically generates sub-pages for these files. Markdown/MDX files render normally, while scripts and schemas display as formatted code blocks.
-- When outputting for agent consumption (`SKILL.md`), the `subfiles` are copied alongside the skill, preserving their relative directory structures.
+- When outputting for agent consumption (`SKILL.md`), the `subfiles` are copied alongside the skill, preserving their relative directory structures. See the **Deployment** chapter for details on the output file format.

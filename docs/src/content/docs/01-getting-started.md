@@ -1,6 +1,6 @@
 ---
 title: Getting Started
-description: Provides core concepts and use cases for the starlight-skills plugin. Use this when you need to understand the philosophy or general purpose of dual-publishing documents and skills.
+description: Provides core concepts and use cases for the starlight-skills plugin. Use this when you need to understand the philosophy or general purpose of dual-publishing documents and skills. Do not use this for installation steps, frontmatter syntax, or configuration options.
 skill: true
 skill-name: starlight-skills-started
 skill-category: usage

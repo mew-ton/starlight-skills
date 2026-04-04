@@ -1,28 +1,35 @@
 ---
 name: starlight-skills-configuration
-description: "Provides all `astro.config.ts` plugin options for starlight-skills. Use this when you need to configure output modes, URL paths, automatic categories, sidebars, or other advanced build settings."
+description: "Provides all `astro.config.ts` plugin options for starlight-skills. Use this when you need to configure output modes, URL paths, automatic categories, sidebars, or other advanced build settings. Do not use this for frontmatter authoring rules or deployment procedures."
 ---
 
 You can configure `starlight-skills` behavior using options in your `astro.config.ts`.
 
+**Minimal setup** (all defaults):
 ```ts
-import { defineConfig } from 'astro/config';
-import starlight from '@astrojs/starlight';
-import starlightSkills from 'starlight-skills'; // (Example path)
+starlightSkills()
+```
 
-export default defineConfig({
-	integrations: [
-		starlight({
-			title: 'My Docs',
-			plugins: [
-				starlightSkills({
-					outputMode: 'both',
-					skillsRoot: '__skills',
-				}),
-			]
-		}),
-	],
-});
+**Monorepo** — output the collocated skills folder to the repository root instead of the docs package root:
+```ts
+starlightSkills({
+  collocatedDir: '../../skills',
+})
+```
+
+**Well-known only** — skip committing files to Git; rely solely on public hosting for skill discovery:
+```ts
+starlightSkills({
+  outputMode: 'well-known-endpoint',
+})
+```
+
+**Custom URL root** — host skill pages under `/agent-skills/` instead of `/__skills/`:
+```ts
+starlightSkills({
+  skillsRoot: 'agent-skills',
+  sidebarLabel: 'Agent Skills',
+})
 ```
 
 ## Plugin Options

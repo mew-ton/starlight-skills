@@ -1,10 +1,9 @@
 ---
 title: Descriptive Frontmatter
-description: Provides rules for writing effective skill descriptions. Use this when setting up frontmatter properties for agent skill documents using starlight-skills. Do not use this for structuring the actual text body.
+description: Provides rules for writing effective skill descriptions. Use this when setting up frontmatter properties for agent skill documents using starlight-skills. Do not use this for structuring the actual text body or plugin configuration options.
 skill: true
+skill-name: starlight-skills-bp-descriptive-frontmatter
 ---
-
-# Descriptive Frontmatter
 
 The `description` field in the frontmatter is the most critical piece of metadata for your skill. 
 

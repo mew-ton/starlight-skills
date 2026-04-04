@@ -1,6 +1,6 @@
 ---
 name: starlight-skills-authoring
-description: "Provides rules and frontmatter schema for writing AI skills. Use this when you need to know how to add `skill: true`, configure skill metadata, or understand the naming constraints."
+description: "Provides rules and frontmatter schema for writing AI skills. Use this when you need to know how to add `skill: true`, configure skill metadata, or understand the naming constraints. Do not use this for plugin configuration options or deployment instructions."
 ---
 
 Authoring a skill is as simple as creating a standard Starlight documentation page and adding a few specific fields to its frontmatter.
@@ -64,3 +64,9 @@ Categories dictate how your skills are grouped in the sidebar and catalog. The c
 1. `skill-category` inside the frontmatter.
 2. Auto-derived from the file path if `autoCategoryMode` is enabled.
 3. Empty string (Uncategorized).
+
+## Frontmatter JSON Schema
+
+A machine-readable JSON Schema for all frontmatter fields is available as a companion file: `_assets/skill-frontmatter.schema.json`.
+
+Use this schema to validate frontmatter values programmatically or to understand the exact constraints (allowed characters, length limits, required fields) for each field without reading prose documentation.

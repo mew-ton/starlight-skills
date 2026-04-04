@@ -1,10 +1,9 @@
 ---
 title: i18n and Skill Locales
-description: Provides rules for handling multi-language documentation. Use this when configuring agent skill documents using starlight-skills on an i18n-enabled project. Do not use this for standard single-language sites.
+description: Provides rules for handling multi-language documentation. Use this when configuring agent skill documents using starlight-skills on an i18n-enabled project. Do not use this for standard single-language sites or plugin configuration options.
 skill: true
+skill-name: starlight-skills-bp-i18n
 ---
-
-# i18n and Skill Locales
 
 If you are using Starlight's i18n features to publish your documentation in multiple languages (e.g., English and Japanese), **you should only set `skill: true` on the English pages**.
 

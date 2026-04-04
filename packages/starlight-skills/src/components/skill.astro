@@ -6,9 +6,9 @@
  * distribution (SKILL.md format), rendered for human reading.
  * noindex prevents duplicate-content issues with the source page.
  */
-import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
-import { marked } from 'marked';
-import { skills } from 'virtual:starlight-skills/data';
+import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
+import { marked } from "marked";
+import { skills } from "virtual:starlight-skills/data";
 
 export function getStaticPaths() {
   return skills.map((skill) => ({
@@ -17,7 +17,7 @@ export function getStaticPaths() {
   }));
 }
 
-type Props = { skill: typeof skills[number] };
+type Props = { skill: (typeof skills)[number] };
 
 const { skill } = Astro.props;
 
@@ -28,7 +28,7 @@ const bodyHtml = await marked.parse(skill.bodyContent, { async: true });
   frontmatter={{
     title: skill.title,
     description: skill.description,
-    head: [{ tag: 'meta', attrs: { name: 'robots', content: 'noindex' } }],
+    head: [{ tag: "meta", attrs: { name: "robots", content: "noindex" } }],
   }}
 >
   <!-- Skill metadata block -->
@@ -36,76 +36,95 @@ const bodyHtml = await marked.parse(skill.bodyContent, { async: true });
     <dt>Skill name</dt>
     <dd><code>{skill.name}</code></dd>
 
-    {skill.description && (
-      <>
-        <dt>Description</dt>
-        <dd>{skill.description}</dd>
-      </>
-    )}
+    {
+      skill.description && (
+        <>
+          <dt>Description</dt>
+          <dd>{skill.description}</dd>
+        </>
+      )
+    }
 
-    {skill.category && (
-      <>
-        <dt>Category</dt>
-        <dd>{skill.category}</dd>
-      </>
-    )}
+    {
+      skill.category && (
+        <>
+          <dt>Category</dt>
+          <dd>{skill.category}</dd>
+        </>
+      )
+    }
 
-    {skill.license && (
-      <>
-        <dt>License</dt>
-        <dd>{skill.license}</dd>
-      </>
-    )}
+    {
+      skill.license && (
+        <>
+          <dt>License</dt>
+          <dd>{skill.license}</dd>
+        </>
+      )
+    }
 
-    {skill.compatibility && (
-      <>
-        <dt>Compatibility</dt>
-        <dd>{skill.compatibility}</dd>
-      </>
-    )}
+    {
+      skill.compatibility && (
+        <>
+          <dt>Compatibility</dt>
+          <dd>{skill.compatibility}</dd>
+        </>
+      )
+    }
 
-    {skill.allowedTools && (
-      <>
-        <dt>Allowed tools</dt>
-        <dd><code>{skill.allowedTools}</code></dd>
-      </>
-    )}
+    {
+      skill.allowedTools && (
+        <>
+          <dt>Allowed tools</dt>
+          <dd>
+            <code>{skill.allowedTools}</code>
+          </dd>
+        </>
+      )
+    }
 
-    {skill.metadata && Object.keys(skill.metadata).length > 0 && (
-      <>
-        <dt>Metadata</dt>
-        <dd>
-          <dl class="sl-skill-metadata-inner">
-            {Object.entries(skill.metadata).map(([k, v]) => (
-              <>
-                <dt>{k}</dt>
-                <dd>{v}</dd>
-              </>
-            ))}
-          </dl>
-        </dd>
-      </>
-    )}
+    {
+      skill.metadata && Object.keys(skill.metadata).length > 0 && (
+        <>
+          <dt>Metadata</dt>
+          <dd>
+            <dl class="sl-skill-metadata-inner">
+              {Object.entries(skill.metadata).map(([k, v]) => (
+                <>
+                  <dt>{k}</dt>
+                  <dd>{v}</dd>
+                </>
+              ))}
+            </dl>
+          </dd>
+        </>
+      )
+    }
+
+    {
+      skill.subfiles.length > 0 && (
+        <>
+          <dt>Companion files</dt>
+          <dd>
+            <ul class="sl-skill-subfiles">
+              {skill.subfiles.map((sf) => (
+                <li>
+                  <a href={sf.viewerUrl}>
+                    <code>{sf.relativePath}</code>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </dd>
+        </>
+      )
+    }
   </dl>
 
   <hr />
 
   <!-- Skill body rendered from Markdown -->
   <div class="sl-markdown-content" set:html={bodyHtml} />
-
-  <!-- Companion files -->
-  {skill.subfiles.length > 0 && (
-    <>
-      <h2>Companion files</h2>
-      <ul class="sl-skill-subfiles">
-        {skill.subfiles.map((sf) => (
-          <li>
-            <a href={sf.viewerUrl}><code>{sf.relativePath}</code></a>
-          </li>
-        ))}
-      </ul>
-    </>
-  )}
 </StarlightPage>
 
 <style>

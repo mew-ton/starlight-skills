@@ -1,0 +1,62 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Skill Frontmatter",
+  "description": "JSON Schema for the frontmatter fields recognized by starlight-skills.",
+  "type": "object",
+  "required": ["skill", "description"],
+  "properties": {
+    "skill": {
+      "type": "boolean",
+      "enum": [true],
+      "description": "Marks this page as an AI Agent Skill. Must be set to `true`."
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Human-readable summary. Used in the catalog and forwarded to SKILL.md. Required."
+    },
+    "title": {
+      "type": "string",
+      "description": "Page title. Used to auto-derive `skill-name` when not explicitly set."
+    },
+    "skill-name": {
+      "type": "string",
+      "pattern": "^[a-z0-9]([a-z0-9-]*[a-z0-9])?$",
+      "minLength": 1,
+      "maxLength": 64,
+      "description": "Machine-readable skill identifier. Lowercase alphanumeric and hyphens only. No leading/trailing/consecutive hyphens. Derived from `title` if omitted."
+    },
+    "skill-category": {
+      "type": "string",
+      "description": "Category path using `/` as separator (e.g. `development/frontend`). Auto-derived from file path when `autoCategoryMode: 'path'` is enabled."
+    },
+    "skill-license": {
+      "type": "string",
+      "description": "License name or reference (e.g. `MIT`, `LICENSE`)."
+    },
+    "skill-compatibility": {
+      "type": "string",
+      "maxLength": 500,
+      "description": "Environment requirements. Describe the intended product, required system packages, etc. Max 500 characters."
+    },
+    "skill-allowed-tools": {
+      "type": "string",
+      "description": "Space-delimited list of pre-approved tool identifiers (e.g. `Bash(git:*) Read Write`)."
+    },
+    "skill-metadata": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Arbitrary key-value metadata forwarded verbatim to the output SKILL.md."
+    },
+    "subfiles": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Glob patterns (relative to this file) for companion text files to bundle with the skill."
+    }
+  },
+  "additionalProperties": true
+}

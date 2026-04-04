@@ -68,6 +68,8 @@ export interface ResolvedSubfile {
   ext: string;
   /** UTF-8 text content of the file. */
   content: string;
+  /** URL of the generated viewer page for this subfile. */
+  viewerUrl: string;
 }
 
 /** Full skill data retained internally throughout the build process. */

@@ -1,10 +1,9 @@
 ---
 title: One Instruction Per File
-description: Provides rules for scoping skill files. Use this when creating or refactoring agent skill documents using starlight-skills. Do not use this for general Markdown formatting.
+description: Provides rules for scoping skill files. Use this when creating or refactoring agent skill documents using starlight-skills. Do not use this for general Markdown formatting or frontmatter configuration.
 skill: true
+skill-name: starlight-skills-bp-one-instruction
 ---
-
-# One Instruction Per File
 
 When writing a skill, limit the scope of a single file to one specific instruction or context. Don't combine multiple unrelated rules into a single massive document.
 

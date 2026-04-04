@@ -1,10 +1,9 @@
 ---
 title: Semantic Markdown
-description: Provides rules for writing semantic Markdown to maximize agent comprehension. Use this when formatting the textual body of agent skill documents using starlight-skills. Do not use this for configuring YAML metadata.
+description: Provides rules for writing semantic Markdown to maximize agent comprehension. Use this when formatting the textual body of agent skill documents using starlight-skills. Do not use this for configuring YAML metadata or plugin options.
 skill: true
+skill-name: starlight-skills-bp-semantic-markdown
 ---
-
-# Semantic Markdown
 
 AI agents process the raw text of your document. To ensure they parse your instructions accurately, you must write highly structured, semantic Markdown.
 
