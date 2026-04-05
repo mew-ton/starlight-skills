@@ -5,6 +5,8 @@
 [![license](https://img.shields.io/npm/l/starlight-skills?style=flat-square)](./LICENSE)
 [![CI](https://img.shields.io/github/actions/workflow/status/mew-ton/starlight-skills/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/mew-ton/starlight-skills/actions/workflows/ci.yml)
 
+*[Read this in Japanese (日本語) 🇯🇵](./README.ja.md)*
+
 A [Starlight](https://starlight.astro.build/) plugin that turns your documentation into AI-installable skills.
 
 Document once — ship to humans **and** AI agents.
@@ -51,126 +53,8 @@ export default defineConfig({
 
 ---
 
-## Marking a page as a skill
+## Documentation
 
-Add `skill: true` to the frontmatter of any documentation page:
+Full documentation, including getting started guides, frontmatter schemas, and configuration options, is available on our dedicated documentation site:
 
-```md
----
-title: Write a React Component
-description: Guidelines for creating consistent, testable React components.
-skill: true
-skill-name: react-component        # optional — derived from title if omitted
-skill-category: development/frontend  # optional — auto-detected from file path
-subfiles:
-  - references/*.md                # companion files bundled with this skill
-  - scripts/*.js
----
-
-# Write a React Component
-
-...
-```
-
-### Frontmatter reference
-
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `skill` | `true` | ✅ | Marks this page as a skill |
-| `skill-name` | `string` | — | Skill identifier (`[a-z0-9-]`, 1–64 chars). Derived from `title` when omitted. |
-| `skill-category` | `string` | — | Category hierarchy, `/`-separated (e.g. `development/frontend`). Auto-detected when `autoCategoryMode` is set. |
-| `subfiles` | `string[]` | — | Glob patterns (relative to this file) for companion files to bundle with the skill. |
-| `description` | `string` | — | Skill description — shared with the Starlight page description. |
-
----
-
-## Options
-
-```ts
-starlightSkills({
-  /** Auto-detect skill-category. 'path' | 'slug' | false. Default: 'path' */
-  autoCategoryMode: 'path',
-
-  /** URL for the generated catalog page. Default: '/skills-catalog' */
-  catalogPath: '/skills-catalog',
-
-  /** Sidebar group label. Default: 'Skills' */
-  sidebarLabel: 'Skills',
-})
-```
-
----
-
-## Build output
-
-Running `astro build` produces two skill trees:
-
-### `dist/.well-known/skills/` — deployed discovery endpoint
-
-Conforms to the [Agent Skills specification](https://agentskills.io/specification) (RFC 8615 well-known URI).
-
-```
-dist/
-└── .well-known/
-    └── skills/
-        ├── index.json                   ← skills registry
-        ├── react-component/
-        │   ├── SKILL.md                 ← spec-compliant skill file
-        │   ├── references/api.md
-        │   └── scripts/scaffold.js
-        └── ...
-```
-
-### `skills/` — project root (committed to the repository)
-
-Same structure, intended to be checked in so that `npx skills add <owner/repo>`
-can install skills directly from the GitHub repository without a deployed site.
-
-```
-skills/
-├── react-component/
-│   ├── SKILL.md
-│   └── ...
-└── ...
-```
-
-### Install from GitHub
-
-```bash
-# From a deployed site (uses .well-known/skills)
-npx skills add https://your-site.example.com
-
-# From a GitHub repository (uses skills/ in the repo)
-npx skills add owner/repo
-```
-
----
-
-## Added pages
-
-| Path | Description |
-|---|---|
-| `/skills-catalog` | Table listing all skills with name, category, and description |
-
-The skills themselves appear at their normal Starlight content URLs and are also
-listed in a **Skills** sidebar group, grouped by category.
-
----
-
-## TypeScript — virtual module
-
-If you import from `virtual:starlight-skills/data` in a custom component,
-add the type declaration to your `tsconfig.json`:
-
-```json
-{
-  "compilerOptions": {
-    "types": ["starlight-skills/virtual"]
-  }
-}
-```
-
-```ts
-import { skills } from 'virtual:starlight-skills/data';
-// skills: SkillData[]
-```
+👉 **[starlight-skills Documentation](https://mew-ton.github.io/starlight-skills/)**

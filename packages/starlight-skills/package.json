@@ -1,6 +1,6 @@
 {
   "name": "starlight-skills",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A Starlight plugin that turns your documentation into AI-installable skills",
   "repository": {
     "type": "git",
@@ -44,7 +44,7 @@
   "dependencies": {
     "glob": "^13.0.6",
     "gray-matter": "^4.0.3",
-    "marked": "^15.0.0"
+    "marked": "^17.0.5"
   },
   "devDependencies": {
     "@astrojs/starlight": "catalog:",
