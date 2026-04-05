@@ -1,5 +1,10 @@
 # starlight-skills
 
+[![npm version](https://img.shields.io/npm/v/starlight-skills?style=flat-square)](https://www.npmjs.com/package/starlight-skills)
+[![npm downloads](https://img.shields.io/npm/dm/starlight-skills?style=flat-square)](https://www.npmjs.com/package/starlight-skills)
+[![license](https://img.shields.io/npm/l/starlight-skills?style=flat-square)](./LICENSE)
+[![CI](https://img.shields.io/github/actions/workflow/status/mew-ton/starlight-skills/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/mew-ton/starlight-skills/actions/workflows/ci.yml)
+
 A [Starlight](https://starlight.astro.build/) plugin that turns your documentation into AI-installable skills.
 
 Document once — ship to humans **and** AI agents.
