@@ -16,4 +16,4 @@ catalog:
   # Pin Tools
   "@biomejs/biome": "^2.4.10"
   tsdown: "^0.21.7"
-  vitest: "^4.1.2"
+  vitest: "^4.1.4"
